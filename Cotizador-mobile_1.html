@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#122062">
+<title>Cotizador · Te lo llevo Fletes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy:   #122062;
+  --navy-d: #0B1442;
+  --navy-m: #1e3a8a;
+  --gold:   #D7BA6A;
+  --gold-l: #F1D57E;
+  --orange: #F08B1F;
+  --red:    #D23A2C;
+  --green:  #2C9F4A;
+  --bg:     #eef3fb;
+  --card:   #ffffff;
+  --ink:    #0D1430;
+  --ink-2:  #37406a;
+  --ink-3:  #6b7390;
+  --rule:   #0d143018;
+  --rule-2: #0d143030;
+  --accent: #F08B1F;
+  --r: 14px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html{background:var(--bg);color:var(--ink);font-family:'Inter',system-ui,sans-serif;font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased;}
+body{min-height:100vh;padding-bottom:env(safe-area-inset-bottom);}
+
+/* ── HERO ── */
+.hero{background:linear-gradient(135deg,var(--navy) 0%,var(--navy-d) 100%);color:#fff;padding:20px 18px 18px;position:relative;overflow:hidden;}
+.hero::after{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;background:linear-gradient(90deg,var(--gold),var(--orange) 55%,var(--red));}
+.hero-top{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+.logo-circle{width:48px;height:48px;border-radius:50%;background:#fff;flex:none;box-shadow:inset 0 0 0 2px var(--gold);display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.logo-circle svg{width:44px;height:44px;}
+.hero-brand .kicker{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);font-weight:600;}
+.hero-brand h1{font-family:'Fraunces',serif;font-weight:900;font-size:22px;letter-spacing:-.02em;line-height:1.05;}
+.hero-brand h1 em{font-style:italic;color:var(--gold-l);}
+.hero-meta{display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:#9fb1e2;border-top:1px solid #fff2;padding-top:10px;}
+.hero-meta b{display:block;color:#fff;font-size:11px;font-weight:600;font-family:'Inter',sans-serif;letter-spacing:0;text-transform:none;margin-top:1px;}
+
+/* ── TABS ── */
+.tabs{display:flex;background:#fff;border-bottom:1px solid var(--rule-2);position:sticky;top:0;z-index:20;box-shadow:0 2px 8px -4px #12206222;}
+.tab{flex:1;padding:11px 6px;font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;font-weight:600;color:var(--ink-3);background:transparent;border:none;cursor:pointer;border-bottom:2px solid transparent;transition:color .15s,border-color .15s;}
+.tab.activo{color:var(--navy);border-bottom-color:var(--navy);}
+
+/* ── PANELS ── */
+.panel{display:none;padding:16px;}
+.panel.activo{display:block;}
+
+/* ── SECCIÓN ── */
+.seccion{background:var(--card);border-radius:var(--r);padding:16px;margin-bottom:12px;border:1px solid var(--rule-2);box-shadow:0 4px 16px -10px #12206222;}
+.sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding-bottom:10px;border-bottom:1px dashed var(--rule-2);}
+.sec-title{font-family:'Fraunces',serif;font-weight:700;font-size:16px;color:var(--navy);}
+.sec-num{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--navy-m);font-weight:700;}
+
+/* ── FIELDS ── */
+.campo{margin-bottom:12px;}
+.campo:last-child{margin-bottom:0;}
+.campo label{display:block;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3);font-weight:600;margin-bottom:5px;}
+.campo input,.campo textarea,.campo select{width:100%;border:1px solid var(--rule-2);background:#f7f9fd;padding:11px 13px;font-family:'Inter',sans-serif;color:var(--ink);font-size:15px;border-radius:10px;transition:border-color .15s,box-shadow .15s;outline:none;appearance:none;-webkit-appearance:none;}
+.campo input:focus,.campo textarea:focus,.campo select:focus{border-color:var(--navy-m);background:#fff;box-shadow:0 0 0 3px #1220621a;}
+.campo textarea{min-height:80px;resize:vertical;}
+.campo input::placeholder,.campo textarea::placeholder{color:#aab4cc;}
+.campo-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.campo-row .campo{margin-bottom:0;}
+
+/* price */
+.price-wrap{display:flex;align-items:center;gap:8px;border:1px solid var(--rule-2);background:#f7f9fd;padding:11px 13px;border-radius:10px;transition:border-color .15s,box-shadow .15s;}
+.price-wrap:focus-within{border-color:var(--navy-m);background:#fff;box-shadow:0 0 0 3px #1220621a;}
+.price-wrap .peso{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-3);font-weight:600;white-space:nowrap;}
+.price-wrap input{border:none;background:transparent;padding:0;font-family:'Fraunces',serif;font-weight:700;font-size:17px;color:var(--ink);width:100%;outline:none;font-variant-numeric:tabular-nums;}
+
+/* chips */
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;}
+.chip{cursor:pointer;font-family:'Inter',sans-serif;font-size:12px;padding:6px 12px;border:1px solid var(--rule-2);background:#f7f9fd;color:var(--ink-2);border-radius:999px;font-weight:600;transition:all .12s;}
+.chip.on{background:var(--navy);color:#fff;border-color:var(--navy);}
+
+/* nota */
+.nota{padding:10px 13px;background:linear-gradient(90deg,#fff8e6,#fff0cc);border:1px solid #f5d37a;border-radius:10px;font-size:12.5px;color:#5a3d00;margin-top:10px;}
+
+/* acciones */
+.acciones{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px;}
+.acciones .btn-full{grid-column:span 2;}
+.btn{display:flex;align-items:center;justify-content:center;gap:7px;padding:12px 14px;border-radius:11px;border:1px solid var(--navy);background:var(--navy);color:#fff;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:background .12s,transform .08s;-webkit-user-select:none;user-select:none;}
+.btn:active{transform:scale(.97);}
+.btn.ghost{background:#fff;color:var(--navy);border-color:var(--rule-2);}
+.btn.ghost:active{background:#f2f6ff;}
+.btn.orange{background:var(--orange);border-color:var(--orange);}
+.btn.green{background:var(--green);border-color:var(--green);}
+.btn svg{width:15px;height:15px;flex:none;}
+
+/* ── DOCUMENTO ── */
+.doc{background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 20px 50px -30px #12206288;border:1px solid var(--rule-2);}
+.doc-head{background:linear-gradient(135deg,var(--navy),var(--navy-d));color:#fff;padding:20px;position:relative;}
+.doc-head::after{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;background:linear-gradient(90deg,var(--gold),var(--orange) 55%,var(--red));}
+.doc-head-top{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.doc-logo{width:46px;height:46px;border-radius:50%;background:#fff;flex:none;box-shadow:inset 0 0 0 2px var(--gold);display:flex;align-items:center;justify-content:center;}
+.doc-logo svg{width:42px;height:42px;}
+.doc-brand .kicker{font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);font-weight:700;}
+.doc-brand h2{font-family:'Fraunces',serif;font-weight:900;font-size:20px;letter-spacing:-.02em;line-height:1;margin-top:2px;}
+.doc-brand .fe{color:var(--gold);font-size:11px;font-weight:700;font-style:italic;margin-top:2px;}
+.doc-meta{font-size:11px;line-height:1.7;color:#d9e2ff;border-top:1px solid #fff2;padding-top:8px;}
+.doc-meta b{color:#fff;}
+
+/* stamp */
+.stamp{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.2em;text-transform:uppercase;font-weight:700;padding:4px 10px;border-radius:999px;background:#e2e8f0;color:#475569;margin-top:6px;}
+.stamp.gen{background:var(--accent);color:#fff;}
+
+.doc-body{padding:16px;}
+
+/* ruta */
+.ruta{display:flex;align-items:center;gap:8px;border:1px dashed var(--rule-2);border-radius:10px;padding:10px 12px;background:#fcfdff;margin-bottom:12px;}
+.ruta .pin{width:8px;height:8px;border-radius:50%;flex:none;}
+.ruta .pin.orig{background:var(--navy);box-shadow:0 0 0 3px #1220620f;}
+.ruta .pin.dest{background:var(--orange);box-shadow:0 0 0 3px #F08B1F11;}
+.ruta .linea{flex:1;height:1px;background:repeating-linear-gradient(90deg,var(--ink-3) 0 3px,transparent 3px 6px);}
+.ruta .km{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--navy);font-weight:700;padding:3px 8px;border-radius:999px;background:#fff;border:1px solid var(--rule-2);letter-spacing:.06em;text-transform:uppercase;}
+
+/* dir */
+.dir-pair{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
+.dir-card{border:1px solid var(--rule-2);border-radius:10px;background:#f7f9fd;padding:10px 12px;}
+.dir-card.dest{background:#fff;}
+.dir-card .cap{font-size:9px;font-weight:700;color:var(--navy);letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px;}
+.dir-card .val{font-size:12px;line-height:1.45;color:var(--ink-2);}
+.dir-card .val.placeholder{color:var(--ink-3);font-style:italic;}
+
+/* datos grid */
+.datos{display:grid;grid-template-columns:1fr 1fr;gap:8px 12px;margin-bottom:12px;}
+.dato .k{font-size:9.5px;color:var(--ink-3);font-weight:600;letter-spacing:.04em;text-transform:uppercase;}
+.dato .v{font-size:13px;color:var(--ink);margin-top:1px;line-height:1.35;}
+
+/* manifiesto */
+.manifiesto{border:1px solid var(--rule-2);border-radius:10px;background:#f7f9fd;padding:10px 12px;margin-bottom:8px;}
+.manifiesto .cap{font-size:9px;font-weight:700;color:var(--navy);letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px;}
+.manifiesto .body{font-size:12.5px;line-height:1.55;color:var(--ink-2);}
+
+/* totales */
+.totales{border-radius:12px;padding:14px;background:linear-gradient(135deg,#fff7e6,#ffe9c9);border:1px solid #f0c878;margin-bottom:10px;}
+.totales .cap{font-size:9px;font-weight:700;color:var(--navy);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px;}
+.tot-filas{display:grid;gap:6px;}
+.tot-fila{display:flex;justify-content:space-between;align-items:center;font-size:13px;}
+.tot-fila .lbl{color:var(--ink-2);}
+.tot-fila .num{font-family:'Fraunces',serif;font-weight:700;font-size:14px;color:var(--ink);}
+.tot-gran{display:flex;justify-content:space-between;align-items:flex-end;background:linear-gradient(135deg,var(--navy),var(--navy-d));border-radius:10px;padding:12px 14px;margin-top:10px;}
+.tot-gran .lbl{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:#c8d3ff;font-weight:700;}
+.tot-gran .monto{font-family:'Fraunces',serif;font-weight:900;font-size:26px;color:var(--gold-l);letter-spacing:-.01em;}
+
+.doc-disclaimer{font-size:11.5px;line-height:1.6;color:var(--ink-3);margin-bottom:8px;}
+
+.doc-foot{background:linear-gradient(135deg,var(--navy),var(--navy-d));padding:14px 16px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;border-top:3px solid var(--gold);}
+.doc-foot .marca{display:flex;align-items:center;gap:8px;}
+.doc-foot .mini{width:34px;height:34px;border-radius:50%;background:#fff;flex:none;box-shadow:inset 0 0 0 2px var(--gold);display:flex;align-items:center;justify-content:center;}
+.doc-foot .mini svg{width:30px;height:30px;}
+.doc-foot h4{font-family:'Fraunces',serif;font-weight:900;font-size:14px;color:#fff;letter-spacing:-.01em;}
+.doc-foot span{color:var(--gold);font-size:10.5px;font-weight:700;font-style:italic;}
+.doc-foot a.wa{display:inline-flex;align-items:center;gap:6px;background:var(--green);color:#fff;padding:7px 12px;border-radius:999px;font-size:12px;font-weight:700;text-decoration:none;}
+
+/* acciones doc */
+.doc-acciones{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;}
+.doc-acciones .btn-full{grid-column:span 2;}
+
+/* toast */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:9px 18px;border-radius:999px;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.06em;z-index:100;box-shadow:0 14px 28px -10px #12206299;white-space:nowrap;pointer-events:none;transition:opacity .2s;}
+.toast.oculto{opacity:0;}
+
+/* print */
+@media print{
+  .tabs,.acciones,.doc-acciones,.hero,.panel:not(#panel-doc){display:none!important;}
+  #panel-doc{display:block!important;padding:0;}
+  .doc{border-radius:0;box-shadow:none;border:none;}
+  body{background:#fff;}
+}
+</style>
+</head>
+<body>
+
+<!-- SVG logo reutilizable -->
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="logo-svg" viewBox="0 0 48 48">
+    <rect width="48" height="48" rx="24" fill="#122062"/>
+    <text x="24" y="32" text-anchor="middle" font-family="Georgia,serif" font-weight="900" font-size="20" fill="#D7BA6A">TL</text>
+  </symbol>
+</svg>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-top">
+    <div class="logo-circle"><svg><use href="#logo-svg"/></svg></div>
+    <div class="hero-brand">
+      <div class="kicker">Cotización · Flete</div>
+      <h1>Te lo llevo <em>Fletes</em></h1>
+    </div>
+  </div>
+  <div class="hero-meta">
+    <div><span>Folio</span><b id="h-folio">—</b></div>
+    <div><span>Fecha</span><b id="h-fecha">—</b></div>
+    <div><span>Oficina</span><b>Santiago RM</b></div>
+    <div><span>Contacto</span><b>+56 9 2683 6544</b></div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs" role="tablist">
+  <button class="tab activo" role="tab" aria-selected="true"  data-panel="form" id="tab-form">📝 Formulario</button>
+  <button class="tab"        role="tab" aria-selected="false" data-panel="doc"  id="tab-doc">📄 Documento</button>
+</div>
+
+<!-- PANEL FORMULARIO -->
+<div id="panel-form" class="panel activo" role="tabpanel" aria-labelledby="tab-form">
+
+  <div class="seccion">
+    <div class="sec-head">
+      <span class="sec-title">Cliente</span>
+      <span class="sec-num">01</span>
+    </div>
+    <div class="campo"><label>Nombre completo</label><input id="f-nombre" placeholder="Ej. Camila Ortega" autocomplete="name"></div>
+    <div class="campo-row">
+      <div class="campo"><label>Teléfono</label><input id="f-tel" type="tel" placeholder="+56 9 ..." autocomplete="tel"></div>
+      <div class="campo"><label>RUT</label><input id="f-rut" placeholder="12.345.678-9"></div>
+    </div>
+    <div class="campo"><label>Correo electrónico</label><input id="f-correo" type="email" placeholder="cliente@email.com" autocomplete="email"></div>
+    <div class="campo"><label>Empresa <span style="color:var(--ink-3);font-style:italic;">(opcional)</span></label><input id="f-empresa" placeholder="—"></div>
+  </div>
+
+  <div class="seccion">
+    <div class="sec-head">
+      <span class="sec-title">Ruta y carga</span>
+      <span class="sec-num">02</span>
+    </div>
+    <div class="campo"><label>Dirección de recogida (origen)</label><input id="f-origen" placeholder="Ej. Av. Independencia 2450, Independencia"></div>
+    <div class="campo"><label>Dirección de entrega (destino)</label><input id="f-destino" placeholder="Ej. Los Carrera 145, Maipú"></div>
+    <div class="campo-row">
+      <div class="campo"><label>Fecha estimada</label><input id="f-fecha" type="date"></div>
+      <div class="campo"><label>Hora estimada</label><input id="f-hora" type="time" value="10:00"></div>
+    </div>
+    <div class="campo"><label>Distancia estimada (km)</label><input id="f-km" type="number" inputmode="numeric" placeholder="Ej. 18"></div>
+    <div class="campo">
+      <label>Tipo de carga</label>
+      <div class="chips" id="chips"></div>
+      <input id="f-carga" placeholder="O escribe otro tipo…">
+    </div>
+    <div class="campo"><label>Detalle de carga</label><textarea id="f-detalle" placeholder="Ej. Sofá 3 cuerpos, cama 2 plazas, 8 cajas medianas…"></textarea></div>
+    <div class="campo"><label>Observaciones</label><textarea id="f-obs" placeholder="Ej. Piso 3 sin ascensor, pasillo estrecho…"></textarea></div>
+  </div>
+
+  <div class="seccion">
+    <div class="sec-head">
+      <span class="sec-title">Valor</span>
+      <span class="sec-num">03</span>
+    </div>
+    <div class="campo"><label>Valor base del flete</label><div class="price-wrap"><span class="peso">CLP $</span><input id="f-base" inputmode="numeric" placeholder="45000"></div></div>
+    <div class="campo"><label>Recargo adicional</label><div class="price-wrap"><span class="peso">CLP $</span><input id="f-recargo" inputmode="numeric" placeholder="0"></div></div>
+    <div class="campo"><label id="lbl-total">Total final · automático</label><div class="price-wrap" id="wrap-total" style="opacity:.72;"><span class="peso">CLP $</span><input id="f-total" inputmode="numeric" placeholder="—"></div></div>
+    <div class="nota"><b>Regla · </b>Si <b>Total final</b> queda vacío, el sistema suma base + recargo. Si escribes un valor manual, se respeta.</div>
+
+    <div class="acciones">
+      <button class="btn ghost" id="btn-reset">↺ Limpiar</button>
+      <button class="btn ghost" id="btn-demo">⎘ Ejemplo</button>
+      <button class="btn btn-full" id="btn-generar">▶ Generar documento</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- PANEL DOCUMENTO -->
+<div id="panel-doc" class="panel" role="tabpanel" aria-labelledby="tab-doc">
+  <div class="doc">
+    <div class="doc-head">
+      <div class="doc-head-top">
+        <div class="doc-logo"><svg><use href="#logo-svg"/></svg></div>
+        <div class="doc-brand">
+          <div class="kicker">Cotización · Guía de servicio</div>
+          <h2>Te lo llevo Fletes</h2>
+          <div class="fe">Avanzamos con fe</div>
+        </div>
+      </div>
+      <div class="doc-meta">
+        <div>Folio · <b id="d-folio">—</b></div>
+        <div>Emitida · <b id="d-fecha-emit">—</b></div>
+        <div>Operador · <b>Te lo llevo Fletes</b></div>
+      </div>
+      <div><span id="d-stamp" class="stamp">BORRADOR</span></div>
+    </div>
+
+    <div class="doc-body">
+      <!-- ruta -->
+      <div class="ruta">
+        <span class="pin orig"></span>
+        <span class="linea"></span>
+        <span id="d-km" class="km">— km</span>
+        <span class="linea"></span>
+        <span class="pin dest"></span>
+      </div>
+      <div class="dir-pair">
+        <div class="dir-card">
+          <div class="cap">De · Origen</div>
+          <div id="d-origen" class="val placeholder">Dirección de recogida</div>
+        </div>
+        <div class="dir-card dest">
+          <div class="cap">A · Destino</div>
+          <div id="d-destino" class="val placeholder">Dirección de entrega</div>
+        </div>
+      </div>
+      <!-- datos -->
+      <div class="datos">
+        <div class="dato"><div class="k">Cliente</div><div id="d-nombre" class="v">—</div></div>
+        <div class="dato"><div class="k">RUT</div><div id="d-rut" class="v">—</div></div>
+        <div class="dato"><div class="k">Teléfono</div><div id="d-tel" class="v">—</div></div>
+        <div class="dato"><div class="k">Correo</div><div id="d-correo" class="v">—</div></div>
+        <div class="dato"><div class="k">Fecha / Hora</div><div id="d-fecha" class="v">—</div></div>
+        <div class="dato"><div class="k">Tipo de carga</div><div id="d-carga" class="v">—</div></div>
+      </div>
+      <!-- manifiesto -->
+      <div id="d-detalle-wrap" class="manifiesto" style="display:none;">
+        <div class="cap">Manifiesto · carga informada</div>
+        <div id="d-detalle" class="body"></div>
+      </div>
+      <div id="d-obs-wrap" class="manifiesto" style="display:none;margin-top:8px;">
+        <div class="cap">Observaciones</div>
+        <div id="d-obs" class="body"></div>
+      </div>
+      <!-- totales -->
+      <div class="totales">
+        <div class="cap">Resumen de valor</div>
+        <div class="tot-filas">
+          <div class="tot-fila"><span class="lbl">Valor base del flete</span><span id="d-base" class="num">$0</span></div>
+          <div class="tot-fila"><span class="lbl">Recargo adicional</span><span id="d-recargo" class="num">$0</span></div>
+        </div>
+        <div class="tot-gran">
+          <div>
+            <div class="lbl">Total del servicio</div>
+            <div id="d-total-sub" style="font-size:9px;color:#9fb1e2;font-family:'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;margin-top:2px;">Base + recargo · CLP</div>
+          </div>
+          <div id="d-total" class="monto">$0</div>
+        </div>
+      </div>
+      <p class="doc-disclaimer">Este valor ha sido calculado en base a las condiciones informadas al momento de la solicitud. En caso de existir cambios en la carga, accesos, tiempos de espera, pisos, ascensor o direcciones, el valor podrá ser ajustado. Agradecemos su preferencia y quedamos atentos a su confirmación.</p>
+    </div>
+
+    <div class="doc-foot">
+      <div class="marca">
+        <div class="mini"><svg><use href="#logo-svg"/></svg></div>
+        <div><h4>Te lo llevo Fletes</h4><span>Avanzamos con fe</span></div>
+      </div>
+      <a class="wa" id="btn-wa-doc" href="#" target="_blank">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="#fff"><path d="M20 12a8 8 0 1 1-3.3-6.5L20 4l-1.2 3.4A8 8 0 0 1 20 12Z"/><path d="M8.5 9.5c.3 2 2 3.7 4 4l1-1.2 2 1-.3 1.4a1.3 1.3 0 0 1-1.4.9A6.9 6.9 0 0 1 7 9.2a1.3 1.3 0 0 1 .9-1.4l1.4-.3 1 2-1.2 1Z"/></svg>
+        +56 9 2683 6544
+      </a>
+    </div>
+  </div>
+
+  <div class="doc-acciones">
+    <button class="btn orange" id="btn-imprimir">⎙ Imprimir / PDF</button>
+    <button class="btn ghost"  id="btn-copiar">⎘ Copiar texto</button>
+    <button class="btn green btn-full" id="btn-wa-btn">
+      <svg viewBox="0 0 24 24" width="15" height="15" fill="#fff"><path d="M20 12a8 8 0 1 1-3.3-6.5L20 4l-1.2 3.4A8 8 0 0 1 20 12Z"/><path d="M8.5 9.5c.3 2 2 3.7 4 4l1-1.2 2 1-.3 1.4a1.3 1.3 0 0 1-1.4.9A6.9 6.9 0 0 1 7 9.2a1.3 1.3 0 0 1 .9-1.4l1.4-.3 1 2-1.2 1Z"/></svg>
+      Enviar por WhatsApp
+    </button>
+    <button class="btn ghost btn-full" id="btn-editar">← Volver al formulario</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast" class="toast oculto"></div>
+
+<script>
+(function(){
+
+/* ── helpers ── */
+const CLP = new Intl.NumberFormat('es-CL',{style:'currency',currency:'CLP',maximumFractionDigits:0});
+const fmtCLP = v=>{const n=Number(String(v??'').replace(/[^\d.-]/g,''));return(!Number.isFinite(n)||v===''||v==null)?'—':CLP.format(n);};
+const fmtFecha = v=>{if(!v)return'—';const[y,m,d]=v.split('-');return`${d}/${m}/${y}`;};
+const hoy = ()=>new Date().toISOString().slice(0,10);
+const hoyDisp = ()=>new Date().toLocaleDateString('es-CL',{day:'2-digit',month:'long',year:'numeric'});
+const mkFolio = ()=>{const t=new Date();return`COT-${t.getFullYear()}${String(t.getMonth()+1).padStart(2,'0')}${String(t.getDate()).padStart(2,'0')}-001`;};
+
+const FOLIO = mkFolio();
+document.getElementById('h-folio').textContent = FOLIO;
+document.getElementById('h-fecha').textContent = hoyDisp();
+document.getElementById('d-folio').textContent = FOLIO;
+document.getElementById('d-fecha-emit').textContent = hoyDisp();
+document.getElementById('f-fecha').value = hoy();
+
+/* ── chips ── */
+const presets = ['Flete simple','Mudanza parcial','Mudanza completa','Retiro tienda','Encomienda','Carga frágil'];
+let chipActivo = '';
+const chipsEl = document.getElementById('chips');
+presets.forEach(p=>{
+  const b = document.createElement('button');
+  b.type='button'; b.className='chip'; b.textContent=p;
+  b.onclick=()=>{
+    chipActivo = chipActivo===p?'':p;
+    document.getElementById('f-carga').value = chipActivo;
+    actualizarChips(); renderDoc();
+  };
+  chipsEl.appendChild(b);
+});
+function actualizarChips(){chipsEl.querySelectorAll('.chip').forEach((b,i)=>b.classList.toggle('on',presets[i]===chipActivo));}
+
+/* ── get/set helpers ── */
+const g = id=>document.getElementById(id)?.value.trim()||'';
+const s = (id,v)=>{const el=document.getElementById(id);if(el)el.value=v;};
+
+/* ── demo data ── */
+const DEMO = {nombre:'Camila Ortega',tel:'+56 9 8721 4409',correo:'camila.ortega@gmail.com',empresa:'',rut:'18.342.901-2',origen:'Av. Independencia 2450, Independencia',destino:'Los Carrera 145, Dept. 304, Maipú',fecha:hoy(),hora:'10:30',carga:'Mudanza parcial',detalle:'Sofá 3 cuerpos · cama 2 plazas · cómoda · mesa comedor · 8 cajas medianas · 2 maletas grandes',obs:'Destino en piso 3 sin ascensor. Acceso por pasillo estrecho; coordinación previa con conserjería.',km:'18',base:'45000',recargo:'10000',total:''};
+
+/* ── estado ── */
+let generado = false;
+
+/* ── render doc ── */
+function calcTotal(){
+  const base=Number(g('f-base')||0), rec=Number(g('f-recargo')||0);
+  const manual=g('f-total');
+  return{total:manual!==''?Number(manual||0):(base+rec), manual:manual!=='', base, rec};
+}
+
+function renderDoc(){
+  const nombre=g('f-nombre'),tel=g('f-tel'),correo=g('f-correo'),rut=g('f-rut');
+  const origen=g('f-origen'),destino=g('f-destino'),fecha=g('f-fecha'),hora=g('f-hora'),km=g('f-km');
+  const carga=g('f-carga'),detalle=g('f-detalle'),obs=g('f-obs');
+  const {total,manual,base,rec}=calcTotal();
+
+  document.getElementById('d-nombre').textContent=nombre||'—';
+  document.getElementById('d-rut').textContent=rut||'—';
+  document.getElementById('d-tel').textContent=tel||'—';
+  document.getElementById('d-correo').textContent=correo||'—';
+  document.getElementById('d-fecha').textContent=`${fmtFecha(fecha)} · ${hora||'—'}`;
+  document.getElementById('d-carga').textContent=carga||'—';
+  document.getElementById('d-km').textContent=km?`${km} km`:'— km';
+
+  const orEl=document.getElementById('d-origen');
+  orEl.textContent=origen||'Dirección de recogida';
+  orEl.className='val'+(origen?'':' placeholder');
+  const deEl=document.getElementById('d-destino');
+  deEl.textContent=destino||'Dirección de entrega';
+  deEl.className='val'+(destino?'':' placeholder');
+
+  const dw=document.getElementById('d-detalle-wrap');
+  dw.style.display=detalle?'block':'none';
+  document.getElementById('d-detalle').textContent=detalle;
+  const ow=document.getElementById('d-obs-wrap');
+  ow.style.display=obs?'block':'none';
+  document.getElementById('d-obs').textContent=obs;
+
+  document.getElementById('d-base').textContent=fmtCLP(base)!=='—'?fmtCLP(base):'$0';
+  document.getElementById('d-recargo').textContent=fmtCLP(rec)!=='—'?fmtCLP(rec):'$0';
+  document.getElementById('d-total').textContent=fmtCLP(total)!=='—'?fmtCLP(total):'$0';
+  document.getElementById('d-total-sub').textContent=manual?'Valor declarado manual · CLP':'Base + recargo · CLP';
+
+  const stamp=document.getElementById('d-stamp');
+  stamp.textContent=generado?'EMITIDA':'BORRADOR';
+  stamp.className='stamp'+(generado?' gen':'');
+
+  document.getElementById('lbl-total').textContent=manual?'Total final · manual':'Total final · automático';
+  document.getElementById('wrap-total').style.opacity=manual?'1':'0.72';
+}
+
+/* ── inputs listen ── */
+['f-nombre','f-tel','f-correo','f-rut','f-empresa','f-origen','f-destino','f-fecha','f-hora','f-km','f-carga','f-detalle','f-obs','f-base','f-recargo','f-total'].forEach(id=>{
+  const el=document.getElementById(id);
+  if(!el)return;
+  el.addEventListener('input',()=>{
+    if(['f-base','f-recargo','f-total'].includes(id)) el.value=el.value.replace(/[^\d]/g,'');
+    if(id==='f-carga'){const v=el.value;chipActivo=presets.includes(v)?v:'';actualizarChips();}
+    renderDoc();
+  });
+});
+
+/* ── texto plano ── */
+function buildTexto(){
+  const {total,base,rec}=calcTotal();
+  const L=[];
+  L.push('COTIZACIÓN · Te lo llevo Fletes');
+  L.push(`Folio: ${FOLIO}  ·  Emitida: ${hoyDisp()}`,'');
+  L.push(`Cliente: ${g('f-nombre')||'-'}`);
+  if(g('f-tel'))L.push(`Teléfono: ${g('f-tel')}`);
+  if(g('f-correo'))L.push(`Correo: ${g('f-correo')}`);
+  if(g('f-rut'))L.push(`RUT: ${g('f-rut')}`);
+  L.push('',`Origen: ${g('f-origen')||'-'}`,`Destino: ${g('f-destino')||'-'}`);
+  L.push(`Fecha/Hora: ${fmtFecha(g('f-fecha'))} · ${g('f-hora')||'—'}`);
+  if(g('f-km'))L.push(`Distancia: ${g('f-km')} km`);
+  if(g('f-carga'))L.push(`Tipo de carga: ${g('f-carga')}`);
+  if(g('f-detalle'))L.push(`Carga: ${g('f-detalle')}`);
+  if(g('f-obs'))L.push(`Obs: ${g('f-obs')}`);
+  L.push('',`Valor base: ${fmtCLP(base)}`,`Recargo: ${fmtCLP(rec)}`,`TOTAL: ${fmtCLP(total)}`,'');
+  L.push('Te lo llevo Fletes · Avanzamos con fe','WhatsApp: +56 9 2683 6544');
+  return L.join('\n');
+}
+
+/* ── toast ── */
+let toastT;
+function ping(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.remove('oculto');
+  clearTimeout(toastT);
+  toastT=setTimeout(()=>t.classList.add('oculto'),2000);
+}
+
+/* ── tabs ── */
+document.querySelectorAll('.tab').forEach(tab=>{
+  tab.addEventListener('click',function(){
+    document.querySelectorAll('.tab').forEach(t=>{t.classList.remove('activo');t.setAttribute('aria-selected','false');});
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('activo'));
+    this.classList.add('activo');
+    this.setAttribute('aria-selected','true');
+    const panel=document.getElementById(`panel-${this.dataset.panel}`);
+    if(panel)panel.classList.add('activo');
+    window.scrollTo({top:0,behavior:'smooth'});
+  });
+});
+
+function irADoc(){
+  document.getElementById('tab-doc').click();
+}
+function irAForm(){
+  document.getElementById('tab-form').click();
+}
+
+/* ── botones ── */
+document.getElementById('btn-reset').addEventListener('click',()=>{
+  ['f-nombre','f-tel','f-correo','f-rut','f-empresa','f-origen','f-destino','f-km','f-carga','f-detalle','f-obs','f-base','f-recargo','f-total'].forEach(id=>s(id,''));
+  s('f-fecha',hoy()); s('f-hora','10:00');
+  chipActivo=''; actualizarChips(); generado=false; renderDoc(); ping('Formulario limpio');
+});
+
+document.getElementById('btn-demo').addEventListener('click',()=>{
+  s('f-nombre',DEMO.nombre); s('f-tel',DEMO.tel); s('f-correo',DEMO.correo);
+  s('f-empresa',DEMO.empresa); s('f-rut',DEMO.rut); s('f-origen',DEMO.origen);
+  s('f-destino',DEMO.destino); s('f-fecha',DEMO.fecha); s('f-hora',DEMO.hora);
+  s('f-carga',DEMO.carga); s('f-detalle',DEMO.detalle); s('f-obs',DEMO.obs);
+  s('f-km',DEMO.km); s('f-base',DEMO.base); s('f-recargo',DEMO.recargo); s('f-total',DEMO.total);
+  chipActivo=DEMO.carga; actualizarChips(); renderDoc(); ping('Datos de ejemplo cargados');
+});
+
+document.getElementById('btn-generar').addEventListener('click',()=>{
+  generado=true; renderDoc(); irADoc(); ping('¡Cotización generada!');
+});
+
+document.getElementById('btn-imprimir').addEventListener('click',()=>window.print());
+
+document.getElementById('btn-copiar').addEventListener('click',async()=>{
+  try{await navigator.clipboard.writeText(buildTexto());ping('Copiada al portapapeles');}
+  catch{ping('No se pudo copiar');}
+});
+
+function waURL(){return`https://wa.me/56926836544?text=${encodeURIComponent(buildTexto())}`;}
+document.getElementById('btn-wa-btn').addEventListener('click',()=>window.open(waURL(),'_blank'));
+document.getElementById('btn-wa-doc').href='#';
+document.getElementById('btn-wa-doc').addEventListener('click',e=>{e.preventDefault();window.open(waURL(),'_blank');});
+
+document.getElementById('btn-editar').addEventListener('click',irAForm);
+
+/* ── init ── */
+renderDoc();
+
+})();
+</script>
+</body>
+</html>
